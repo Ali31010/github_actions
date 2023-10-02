@@ -42,9 +42,7 @@ jobs:
           DATABASE_URL: postgres://postgres:@localhost:5432/test
           RAILS_ENV: test
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-
-      - name: Install dependencies
-        run: |
+        run: |  # Added 'run' key for this step
           gem install bundler -v 2.3.26
           bundle install
           yarn install
