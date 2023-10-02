@@ -3,15 +3,17 @@
 name: Rails CI
 
 on:
-  [push, pull_request]:
+  push:
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    service:
+    services:
       db:
         image: postgres:14.9
-        ports: ['5432:5432']
+        ports:
+          - '5432:5432'
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
