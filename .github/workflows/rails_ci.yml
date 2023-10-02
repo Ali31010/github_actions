@@ -3,13 +3,20 @@
 name: Rails CI
 
 on:
-  push:
-    branches:
-      - main  # Change this to the main branch name if it's different
+  [push, pull_request]:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    service:
+      db:
+        image: postgres:14.9
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -27,6 +34,12 @@ jobs:
       
       - name: Start PostgreSQL Service
         run: sudo service postgresql start 
+      
+      - name: Build and run test
+        env: 
+          DATABASE_URL: postgres://postgres:@localhost:5432/test
+          RAILS_ENV: test
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
       - name: Install dependencies
         run: |
