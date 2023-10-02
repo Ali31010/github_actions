@@ -24,10 +24,10 @@ jobs:
         options: --entrypoint redis-server
 
     steps:
-      - uses: actions/checkout@v2  # Use actions/checkout@v2 instead of actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1  # Replace with the actively maintained action
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.5.8
 
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build and run tests
         env:
-          DATABASE_URL: postgres://postgres:@localhost:5432/test
+          DATABASE_URL: postgres://postgres:postgres_password@localhost:5432/test  # Update password here
           REDIS_URL: redis://localhost:6379/0
           RAILS_ENV: test
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
