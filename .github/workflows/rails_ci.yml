@@ -31,9 +31,6 @@ jobs:
         with:
           ruby-version: 2.5.8
 
-      - name: Inspect PostgreSQL Service Logs
-        run: docker logs db
-
       - uses: borales/actions-yarn@v2.0.0
         with:
           cmd: install
