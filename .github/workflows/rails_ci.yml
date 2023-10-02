@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: mypostgresuser  # Set the PostgreSQL superuser username
+      POSTGRES_PASSWORD: mysecretpassword  # Set the PostgreSQL superuser password
+      POSTGRES_DB: test_app_development  # Set the development database name
+
     services:
       db:
         image: postgres:14.9
@@ -39,10 +44,10 @@ jobs:
       
       - name: Build and run test
         env: 
-          DATABASE_URL: postgres://postgres:@localhost:5432/test
+          DATABASE_URL: postgres://mypostgresuser:mysecretpassword@localhost:5432/test_app_development
           RAILS_ENV: test
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-        run: |  # Added 'run' key for this step
+        run: |
           gem install bundler -v 2.3.26
           bundle install
           yarn install
