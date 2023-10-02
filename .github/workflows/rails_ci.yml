@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v2  # Use actions/checkout@v2 instead of actions/checkout@v1
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v2  # Replace with the actively maintained action
+        uses: ruby/setup-ruby@v1  # Replace with the actively maintained action
         with:
           ruby-version: 2.5.8
 
