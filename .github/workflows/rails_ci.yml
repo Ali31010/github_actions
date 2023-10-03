@@ -1,41 +1,54 @@
-# .github/workflows/rails_ci.yml
+name: CI
 
-name: Rails CI
-
-on:
-  push:
-    branches:
-      - main  # Change this to the main branch name if it's different
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    services:
+      db:
+        image: postgres:14
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_PASSWORD: postgres_password  # Replace with your desired PostgreSQL password
 
-      - name: Set up Ruby
+      redis:
+        image: redis
+        ports: ['6379:6379']
+        options: --entrypoint redis-server
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5.8  # Change to your desired Ruby version
+          ruby-version: 2.5.8
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14  # Change to your desired Node.js version
-      
-      - name: Start PostgreSQL Service
-        run: sudo service postgresql start 
+          node-version: 14
 
-      - name: Install dependencies
+      # - uses: borales/actions-yarn@v2.0.0
+      #   with:
+      #     cmd: install
+
+      - name: Build and run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres_password@localhost:5432/test  # Update password here
+          REDIS_URL: redis://localhost:6379/0
+          RAILS_ENV: test
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
         run: |
+          sudo apt-get -yqq install libpq-dev
           gem install bundler -v 2.3.26
-          bundle install
-          yarn install
-
-      - name: Run tests
-        run: |
-          bundle exec rails db:create
-          bundle exec rails db:migrate
-          bundle exec rspec
+          bundle install --jobs 4 --retry 3
+          bundle exec rails db:prepare
+          bundle exec rspec 
